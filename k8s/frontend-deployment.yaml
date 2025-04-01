@@ -52,3 +52,4 @@ spec:
       targetPort: 5000  # Maps to frontend container port
       nodePort: 30050  # Exposed externally on all nodes
   type: NodePort  # Exposes service on a fixed port (30050)
+  
