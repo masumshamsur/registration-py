@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <h1>My Registration App</h1>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/users">Saved Users</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h2>List of Users</h2>
+        {% if users %}
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Country</th>
+                    <th>Gender</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.firstname }}</td>
+                        <td>{{ user.lastname }}</td>
+                        <td>{{ user.country }}</td>
+                        <td>{{ user.gender }}</td>
+                        <td>
+                            <form method="POST" action="/delete/{{ user._id|string }}" 
+                                  onsubmit="return confirmDelete('{{ user.firstname }}', '{{ user.lastname }}');">
+                                <button type="submit" class="delete-button">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p>No users found.</p>
+        {% endif %}
+        <a href="/">Go back to the form</a>
+    </div>
+    <footer>
+        <p>Developed by Shamsur R Masum</p>
+    </footer>
+
+    <script>
+        function confirmDelete(firstname, lastname) {
+            return confirm(`Are you sure you want to delete ${firstname} ${lastname}?`);
+        }
+    </script>
+</body>
+</html>

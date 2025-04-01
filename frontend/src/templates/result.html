@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submission Successful</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <h1>My Registration App</h1>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/users">Saved Users</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h2>Success!</h2>
+        <p>Your data has been saved successfully.</p>
+        <p><strong>First Name:</strong> {{ first_name }}</p>
+        <p><strong>Last Name:</strong> {{ last_name }}</p>
+        <p><strong>Country:</strong> {{ country }}</p>
+        <p><strong>Gender:</strong> {{ gender }}</p>
+    </div>
+    <footer>
+        <p>Developed by Shamsur R Masum</p>
+    </footer>
+</body>
+</html>

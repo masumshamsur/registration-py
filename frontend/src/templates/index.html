@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <h1>My Registration App</h1>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/users">Saved Users</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h2>Welcome to the Registration Page!</h2>
+        <form method="POST" action="/submit">
+            <label for="firstname">First Name:</label>
+            <input type="text" id="firstname" name="firstname" placeholder="Enter your first name" required />
+
+            <label for="lastname">Last Name:</label>
+            <input type="text" id="lastname" name="lastname" placeholder="Enter your last name" required />
+
+            <label for="country">Country:</label>
+            <select id="country" name="country" required>
+                <option value="">Select your country</option>
+                <option value="USA">USA</option>
+                <option value="Canada">Canada</option>
+                <option value="UK">UK</option>
+                <option value="India">India</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="gender">Gender:</label>
+            <div>
+                <input type="radio" id="male" name="gender" value="Male" required />
+                <label for="male">Male</label>
+                <input type="radio" id="female" name="gender" value="Female" required />
+                <label for="female">Female</label>
+                <input type="radio" id="other" name="gender" value="Other" required />
+                <label for="other">Other</label>
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <footer>
+        <p>Developed by Shamsur R Masum</p>
+    </footer>
+</body>
+</html>
