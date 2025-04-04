@@ -37,7 +37,7 @@ try:
         dbname=os.getenv('POSTGRES_DATABASE', 'mydatabase'),
         user=os.getenv('POSTGRES_USER', 'myUser'),
         password=os.getenv('POSTGRES_PASSWORD', 'myPass'),
-        host=os.getenv('POSTGRES_HOST', 'postgres-service.registration-fb.svc.cluster.local'),
+        host=os.getenv('POSTGRES_HOST', 'localhost'),
         port=os.getenv('POSTGRES_PORT', 5432),
         cursor_factory=RealDictCursor
     )

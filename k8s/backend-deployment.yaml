@@ -37,7 +37,7 @@ spec:
                   name: postgres-secret
                   key: password
             - name: POSTGRES_HOST
-              value: postgres-service.registration-fb.svc.cluster.local  # PostgreSQL service name in Kubernetes
+              value: postgres-service   # PostgreSQL service name in Kubernetes
             - name: POSTGRES_DATABASE
               value: mydatabase  # Database name in PostgreSQL
 ---
