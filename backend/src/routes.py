@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, Form, HTTPException
-from src.database import get_db
-from bson import ObjectId
+from .database import get_db  # Ensure import is correct
 
 router = APIRouter()
 
@@ -12,43 +11,42 @@ async def submit_form(
     gender: str = Form(...),
     db=Depends(get_db)
 ):
-    user_data = {
-        "firstname": firstname,
-        "lastname": lastname,
-        "country": country,
-        "gender": gender
-    }
-    result = db["users"].insert_one(user_data)  # Insert the user and get the inserted ID
-    return {"message": "Data saved successfully!", "user_id": str(result.inserted_id)}
+    user_data = (firstname, lastname, country, gender)
+    try:
+        with db.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO users (firstname, lastname, country, gender)
+                VALUES (%s, %s, %s, %s)
+                RETURNING id;
+                """,
+                user_data
+            )
+            user_id = cursor.fetchone()["id"]
+        return {"message": "Data saved successfully!", "user_id": user_id}
+    except Exception as e:
+        print(f"❌ PostgreSQL Insert Error: {e}")
+        raise HTTPException(status_code=500, detail="Database Insert Error")
 
 @router.get("/users")
 async def get_users(db=Depends(get_db)):
-    users = list(db["users"].find({}, {"_id": 1, "firstname": 1, "lastname": 1, "country": 1, "gender": 1}))
-
-    # Convert ObjectId to string and handle missing keys safely
-    user_list = [
-        {
-            "_id": str(user["_id"]),
-            "firstname": user.get("firstname", ""),  # Avoid KeyError
-            "lastname": user.get("lastname", ""),    # Avoid KeyError
-            "country": user.get("country", "N/A"),   # Default value if missing
-            "gender": user.get("gender", "N/A")      # Default value if missing
-        }
-        for user in users
-    ]
-
-    return {"users": user_list}
+    try:
+        with db.cursor() as cursor:
+            cursor.execute("SELECT id, firstname, lastname, country, gender FROM users;")
+            users = cursor.fetchall()
+        return {"users": users}
+    except Exception as e:
+        print(f"❌ Error fetching users: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching users")
 
 @router.delete("/delete/{user_id}")
-async def delete_user(user_id: str, db=Depends(get_db)):
+async def delete_user(user_id: int, db=Depends(get_db)):
     try:
-        obj_id = ObjectId(user_id)  # Validate ObjectId
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid user ID format")
-
-    result = db["users"].delete_one({"_id": obj_id})
-
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    return {"message": "User deleted successfully!"}
+        with db.cursor() as cursor:
+            cursor.execute("DELETE FROM users WHERE id = %s;", (user_id,))
+            if cursor.rowcount == 0:
+                raise HTTPException(status_code=404, detail="User not found")
+        return {"message": "User deleted successfully!"}
+    except Exception as e:
+        print(f"❌ Error deleting user: {e}")
+        raise HTTPException(status_code=500, detail="Error deleting user")

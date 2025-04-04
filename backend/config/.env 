@@ -1,3 +1,5 @@
 MONGO_USERNAME=myUser
 MONGO_PASSWORD=myPass
 MONGO_DATABASE=mydatabase
+MONGO_HOST=postgres-service.registration-fb.svc.cluster.local
+MONGO_PORT=27017

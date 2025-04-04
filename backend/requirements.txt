@@ -4,3 +4,4 @@ pymongo
 jinja2
 python-dotenv
 python-multipart  
+psycopg2-binary>=2.9,<3.0

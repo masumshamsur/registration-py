@@ -1,21 +1,71 @@
 import os
-from pymongo import MongoClient
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv(dotenv_path="./config/.env")
+load_dotenv(dotenv_path="./.env")
 
-#MONGO_URI = f"mongodb://{os.getenv('MONGO_USERNAME')}:{os.getenv('MONGO_PASSWORD')}@mongodb-service:27017/{os.getenv('MONGO_DATABASE')}?authSource=admin"
-MONGO_URI = f"mongodb://{os.getenv('MONGO_USERNAME')}:{os.getenv('MONGO_PASSWORD')}@{os.getenv('MONGO_HOST')}:27017/{os.getenv('MONGO_DATABASE')}?authSource=admin"
+# Establish database connection and create the database if not exists
+def create_database():
+    conn = psycopg2.connect(
+        dbname="postgres",  # Connect to the default system database
+        user=os.getenv('POSTGRES_USER', 'myUser'),
+        password=os.getenv('POSTGRES_PASSWORD', 'myPass'),
+        host=os.getenv('POSTGRES_HOST', 'localhost'),
+        port=os.getenv('POSTGRES_PORT', 5432),
+    )
+    conn.autocommit = True
+    cursor = conn.cursor()
 
+    database_name = os.getenv('POSTGRES_DATABASE', 'mydatabase')
+    cursor.execute(f"SELECT 1 FROM pg_database WHERE datname = '{database_name}'")
+    if not cursor.fetchone():
+        cursor.execute(f"CREATE DATABASE {database_name}")
+        print(f"✅ Database '{database_name}' created successfully!")
+    else:
+        print(f"✅ Database '{database_name}' already exists.")
 
-# Establish MongoDB connection
+    cursor.close()
+    conn.close()
+
+create_database()  # Ensure the database exists before proceeding
+
+# Connect to the newly created database
 try:
-    client = MongoClient(MONGO_URI)
-    db = client[os.getenv('MONGO_DATABASE')]
-    print("✅ Successfully connected to MongoDB!")
+    conn = psycopg2.connect(
+        dbname=os.getenv('POSTGRES_DATABASE', 'mydatabase'),
+        user=os.getenv('POSTGRES_USER', 'myUser'),
+        password=os.getenv('POSTGRES_PASSWORD', 'myPass'),
+        host=os.getenv('POSTGRES_HOST', 'postgres-service.registration-fb.svc.cluster.local'),
+        port=os.getenv('POSTGRES_PORT', 5432),
+        cursor_factory=RealDictCursor
+    )
+    conn.autocommit = True
+    print("✅ Successfully connected to PostgreSQL!")
 except Exception as e:
-    print(f"❌ Error connecting to MongoDB: {e}")
+    print(f"❌ Error connecting to PostgreSQL: {e}")
+    conn = None
+
+# Ensure users table exists
+def create_users_table():
+    if conn:
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS users (
+                        id SERIAL PRIMARY KEY,
+                        firstname VARCHAR(50) NOT NULL,
+                        lastname VARCHAR(50) NOT NULL,
+                        country VARCHAR(50) NOT NULL,
+                        gender VARCHAR(10) NOT NULL
+                    );
+                """)
+                print("✅ 'users' table checked/created successfully!")
+        except Exception as e:
+            print(f"❌ Error creating 'users' table: {e}")
+
+create_users_table()  # Ensure table exists
 
 def get_db():
-    return db
+    return conn

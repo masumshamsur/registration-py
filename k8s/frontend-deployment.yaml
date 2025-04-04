@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: name-store-fb
+  namespace: registration-fb
 spec:
   replicas: 1
   selector:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: masum012924/name-store-frontend:latest
+          image: masum012924/registration-frontend:latest
           ports:
             - containerPort: 5000  # Ensure your frontend actually runs on this port
           resources:
@@ -42,7 +42,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: frontend-service
-  namespace: name-store-fb
+  namespace: registration-fb
 spec:
   selector:
     app: frontend

@@ -1,5 +1,5 @@
 from pymongo import IndexModel, ASCENDING
-from src.database import db
+from .database import db
 
 # User collection model
 users_collection = db["users"]
