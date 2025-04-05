@@ -1,2 +1,6 @@
 Flask
 requests
+prometheus_flask_exporter
+# For testing
+pytest
+pytest-mock

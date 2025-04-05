@@ -1,7 +1,9 @@
 import requests
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, jsonify, redirect, url_for
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__, template_folder="templates")  # Ensure templates folder is used
+metrics = PrometheusMetrics(app)
 
 # Home Page (Form Submission)
 @app.route('/')
@@ -57,14 +59,12 @@ def users():
 def delete_user(user_id):
     try:
         response = requests.delete(f'http://backend-service:8000/delete/{user_id}')
-
         if response.status_code == 200:
-            return redirect(url_for('users'))  # Redirect to users list after deletion
+            return jsonify({"message": "User deleted successfully"}), 200
         else:
-            return f"Error: {response.status_code} - {response.text}", response.status_code
-
-    except requests.exceptions.RequestException as e:
-        return f"Error: Unable to delete user - {str(e)}", 500
+            return jsonify({"error": "Failed to delete user"}), response.status_code
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)

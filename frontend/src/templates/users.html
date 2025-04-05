@@ -14,6 +14,7 @@
             <li><a href="/users">Saved Users</a></li>
         </ul>
     </nav>
+
     <div class="container">
         <h2>List of Users</h2>
         {% if users %}
@@ -29,17 +30,22 @@
             </thead>
             <tbody>
                 {% for user in users %}
-                    <tr>
-                        <td>{{ user.firstname }}</td>
-                        <td>{{ user.lastname }}</td>
-                        <td>{{ user.country }}</td>
-                        <td>{{ user.gender }}</td>
-                        <td>
-                            <button onclick="deleteUser({{ user.id }}, '{{ user.firstname }}', '{{ user.lastname }}')" class="delete-button">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>{{ user.firstname }}</td>
+                    <td>{{ user.lastname }}</td>
+                    <td>{{ user.country }}</td>
+                    <td>{{ user.gender }}</td>
+                    <td>
+                        <button
+                            class="delete-button"
+                            data-user-id="{{ user.id }}"
+                            data-firstname="{{ user.firstname }}"
+                            data-lastname="{{ user.lastname }}"
+                            onclick="handleDelete(this)">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -48,28 +54,44 @@
         {% endif %}
         <a href="/">Go back to the form</a>
     </div>
+
     <footer>
         <p>Developed by Shamsur R Masum</p>
     </footer>
 
     <script>
-        async function deleteUser(userId, firstname, lastname) {
+        function handleDelete(button) {
+            const userId = button.getAttribute("data-user-id");
+            const firstname = button.getAttribute("data-firstname");
+            const lastname = button.getAttribute("data-lastname");
+
             if (confirm(`Are you sure you want to delete ${firstname} ${lastname}?`)) {
-                try {
-                    const response = await fetch(`http://localhost:8000/delete/${userId}`, {
-                        method: 'DELETE',
-                    });
+                fetch(`/delete/${userId}`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
                     if (response.ok) {
-                        alert('User deleted successfully!');
-                        location.reload(); // Reload the page to update the user list
+                        return response.json().then(data => {
+                            alert(data.message || 'User deleted successfully!');
+                            location.reload();
+                        });
                     } else {
-                        const errorData = await response.json();
-                        alert(`Failed to delete user: ${errorData.detail}`);
+                        // If not JSON (like an error page), catch that
+                        return response.text().then(text => {
+                            try {
+                                const errorData = JSON.parse(text);
+                                alert(`Failed to delete user: ${errorData.detail || errorData.error || 'Unknown error'}`);
+                            } catch (err) {
+                                console.error("Non-JSON error response:", text);
+                                alert(`Unexpected error: ${text}`);
+                            }
+                        });
                     }
-                } catch (error) {
+                })
+                .catch(error => {
                     console.error('Error deleting user:', error);
-                    alert('An error occurred. Please try again.');
-                }
+                    alert(`An error occurred: ${error.message}`);
+                });
             }
         }
     </script>
