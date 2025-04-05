@@ -53,7 +53,7 @@ def users():
         return f"Error: Unable to fetch data - {str(e)}", 500
 
 # Delete User by ID
-@app.route('/delete/<user_id>', methods=['POST'])
+@app.route('/delete/<user_id>', methods=['DELETE'])
 def delete_user(user_id):
     try:
         response = requests.delete(f'http://backend-service:8000/delete/{user_id}')
