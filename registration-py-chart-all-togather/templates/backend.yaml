@@ -31,9 +31,14 @@ spec:
                   name: postgres-secret
                   key: password
             - name: POSTGRES_HOST
-              value: {{ .Values.microservice.postgres.service.name }}
+              value: {{ .Values.microservice.postgres.service.name }}.{{ .Values.microservice.namespace }}.svc.cluster.local
             - name: POSTGRES_DATABASE
               value: {{ .Values.microservice.postgres.env.database }}
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 5
+            periodSeconds: 10
 ---
 # templates/backend-service.yaml
 apiVersion: v1
