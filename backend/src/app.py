@@ -19,3 +19,8 @@ app.include_router(router)
 @app.get("/")
 async def root():
     return {"message": "Backend is running!"}
+
+# ✅ Add this below your root endpoint
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}

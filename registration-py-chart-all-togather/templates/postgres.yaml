@@ -47,14 +47,11 @@ spec:
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data
-  volumeClaimTemplates:
-    - metadata:
-        name: postgres-storage
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: {{ .Values.microservice.pvc.storage }}
+          volumes:
+            - name: postgres-storage
+              persistentVolumeClaim:
+                claimName: postgres-pvc
+
 ---
 # templates/postgres-service.yaml
 apiVersion: v1
@@ -83,9 +80,6 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /mnt/data/postgres
-  claimRef:
-    namespace: {{ .Values.microservice.namespace }}
-    name: postgres-storage-{{ .Values.microservice.name }}-postgres-0
 
 ---
 # templates/postgres-pvc.yaml
