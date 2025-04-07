@@ -35,10 +35,13 @@ spec:
             - name: POSTGRES_DATABASE
               value: {{ .Values.microservice.postgres.env.database }}
           readinessProbe:
-            tcpSocket:
-              port: 5432
+            httpGet:
+                path: /health
+                port: 8000
             initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
 ---
 # templates/backend-service.yaml
 apiVersion: v1
