@@ -1,0 +1,38 @@
+microservice:
+  name: registration
+  description: A microservice for user registration and authentication
+  namespace: registration-fb
+
+  backend:
+    image:
+      repository: masum012924/registration-backend
+      tag: latest
+    service:
+      type: ClusterIP
+      port: 8000
+
+  frontend:
+    image:
+      repository: masum012924/registration-frontend
+      tag: latest
+    service:
+      type: NodePort
+      port: 5000
+      nodePort: 30050
+
+  postgres:
+    image:
+      repository: postgres
+      tag: "15.0"
+    service:
+      name: postgres-service
+      port: 5432
+    env:
+      username: myUser
+      password: myPass
+      database: mydatabase
+
+  pv:
+    storage: 1Gi
+  pvc:
+    storage: 1Gi

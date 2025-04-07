@@ -1,0 +1,5 @@
+apiVersion: v2
+name: registration-frontend
+description: Helm chart for the registration frontend
+version: 0.1.0
+appVersion: "1.0"

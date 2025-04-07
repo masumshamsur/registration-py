@@ -1,0 +1,48 @@
+# templates/frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservice.name }}-frontend
+  namespace: {{ .Values.microservice.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: {{ .Values.microservice.frontend.image.repository }}:{{ .Values.microservice.frontend.image.tag }}
+          ports:
+            - containerPort: {{ .Values.microservice.frontend.service.port }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.microservice.frontend.service.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.microservice.frontend.service.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+# templates/frontend-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.microservice.name }}-frontend-service
+  namespace: {{ .Values.microservice.namespace }}
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 80
+      targetPort: {{ .Values.microservice.frontend.service.port }}
+      nodePort: {{ .Values.microservice.frontend.service.nodePort }}
+  type: {{ .Values.microservice.frontend.service.type }}

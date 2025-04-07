@@ -1,0 +1,19 @@
+microservice:
+  name: registration-statefulset
+  namespace: registration-fb
+
+  postgres:
+    image: postgres:15.0
+    username: myuser
+    password: mypassword
+    database: mydatabase
+    storage: 10Gi
+    pvc:
+      name: postgres-pvc
+    pv:
+      name: postgres-pv
+      path: /mnt/data/postgres
+
+  service:
+    name: postgres-service
+    port: 5432

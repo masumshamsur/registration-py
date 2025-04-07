@@ -1,0 +1,31 @@
+microservice:
+  name: registration-frontend
+  description: A microservice for user registration and authentication
+  namespace: registration-fb
+  replicaCount: 1
+  image:
+    repository: masum012924/registration-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 80
+    targetPort: 5000
+    nodePort: 30050
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 250m
+      memory: 128Mi
+  livenessProbe:
+    path: /
+    port: 5000
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  readinessProbe:
+    path: /
+    port: 5000
+    initialDelaySeconds: 5
+    periodSeconds: 10

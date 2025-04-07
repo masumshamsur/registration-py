@@ -1,0 +1,99 @@
+# templates/postgres-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+  namespace: {{ .Values.microservice.namespace }}
+type: Opaque
+data:
+  username: {{ .Values.microservice.postgres.env.username | b64enc }}
+  password: {{ .Values.microservice.postgres.env.password | b64enc }}
+---
+# templates/postgres-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.microservice.name }}-postgres
+  namespace: {{ .Values.microservice.namespace }}
+spec:
+  serviceName: {{ .Values.microservice.postgres.service.name }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.microservice.postgres.image.repository }}:{{ .Values.microservice.postgres.image.tag }}
+          ports:
+            - containerPort: {{ .Values.microservice.postgres.service.port }}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: POSTGRES_DB
+              value: {{ .Values.microservice.postgres.env.database }}
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.microservice.pvc.storage }}
+---
+# templates/postgres-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.microservice.postgres.service.name }}
+  namespace: {{ .Values.microservice.namespace }}
+spec:
+  clusterIP: None
+  selector:
+    app: postgres
+  ports:
+    - port: {{ .Values.microservice.postgres.service.port }}
+      targetPort: {{ .Values.microservice.postgres.service.port }}
+---
+# templates/postgres-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+  namespace: {{ .Values.microservice.namespace }}
+spec:
+  capacity:
+    storage: {{ .Values.microservice.pv.storage }}
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /mnt/data/postgres
+---
+# templates/postgres-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: {{ .Values.microservice.namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.microservice.pvc.storage }}

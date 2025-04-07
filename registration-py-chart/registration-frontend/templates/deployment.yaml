@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservice.name }}-deployment
+  namespace: {{ .Values.microservice.namespace }}
+spec:
+  replicas: {{ .Values.microservice.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.microservice.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.microservice.name }}
+    spec:
+      containers:
+        - name: {{ .Values.microservice.name }}
+          image: "{{ .Values.microservice.image.repository }}:{{ .Values.microservice.image.tag }}"
+          imagePullPolicy: {{ .Values.microservice.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.microservice.service.targetPort }}
+          resources:
+            requests:
+              memory: {{ .Values.microservice.resources.requests.memory }}
+              cpu: {{ .Values.microservice.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.microservice.resources.limits.memory }}
+              cpu: {{ .Values.microservice.resources.limits.cpu }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.microservice.livenessProbe.path }}
+              port: {{ .Values.microservice.livenessProbe.port }}
+            initialDelaySeconds: {{ .Values.microservice.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservice.livenessProbe.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.microservice.readinessProbe.path }}
+              port: {{ .Values.microservice.readinessProbe.port }}
+            initialDelaySeconds: {{ .Values.microservice.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.microservice.readinessProbe.periodSeconds }}

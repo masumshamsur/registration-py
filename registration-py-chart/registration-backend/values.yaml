@@ -1,0 +1,24 @@
+microservice:
+  name: registration-backend
+  description: A microservice for user registration and authentication
+  namespace: registration-fb
+  replicaCount: 1
+  image:
+    repository: masum012924/registration-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 250m
+      memory: 128Mi
+  postgres:
+    user: myUser
+    password: myPass
+    database: mydatabase
+    host: postgres-service    

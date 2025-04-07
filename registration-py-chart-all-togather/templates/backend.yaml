@@ -1,0 +1,50 @@
+# templates/backend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.microservice.name }}-backend
+  namespace: {{ .Values.microservice.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: {{ .Values.microservice.backend.image.repository }}:{{ .Values.microservice.backend.image.tag }}
+          ports:
+            - containerPort: {{ .Values.microservice.backend.service.port }}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: POSTGRES_HOST
+              value: {{ .Values.microservice.postgres.service.name }}
+            - name: POSTGRES_DATABASE
+              value: {{ .Values.microservice.postgres.env.database }}
+---
+# templates/backend-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.microservice.name }}-backend-service
+  namespace: {{ .Values.microservice.namespace }}
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: {{ .Values.microservice.backend.service.port }}
+      targetPort: {{ .Values.microservice.backend.service.port }}
+  type: {{ .Values.microservice.backend.service.type }}

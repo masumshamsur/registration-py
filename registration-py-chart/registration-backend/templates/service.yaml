@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.microservice.name }}-service
+  namespace: {{ .Values.microservice.namespace }}
+spec:
+  selector:
+    app: {{ .Values.microservice.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.microservice.service.port }}
+      targetPort: {{ .Values.microservice.service.port }}
+  type: {{ .Values.microservice.service.type }}
