@@ -60,7 +60,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.microservice.postgres.service.name }}
+  name: postgres-service
   namespace: {{ .Values.microservice.namespace }}
 spec:
   clusterIP: None
