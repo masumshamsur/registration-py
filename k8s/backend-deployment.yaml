@@ -40,6 +40,14 @@ spec:
               value: postgres-service   # PostgreSQL service name in Kubernetes
             - name: POSTGRES_DATABASE
               value: mydatabase  # Database name in PostgreSQL
+          readinessProbe:
+            httpGet:
+                path: /health
+                port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1    
 ---
 apiVersion: v1
 kind: Service
