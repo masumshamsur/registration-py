@@ -54,7 +54,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.microservice.name }}-backend-service
+  name: backend-service
   namespace: {{ .Values.microservice.namespace }}
 spec:
   selector:
