@@ -19,6 +19,13 @@ spec:
           image: {{ .Values.microservice.backend.image.repository }}:{{ .Values.microservice.backend.image.tag }}
           ports:
             - containerPort: {{ .Values.microservice.backend.service.port }}
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"  
           env:
             - name: POSTGRES_USER
               valueFrom:
