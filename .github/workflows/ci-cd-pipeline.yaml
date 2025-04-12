@@ -36,6 +36,7 @@ jobs:
         # run tests
         - name: Run tests
           run: |
+            export PYTHONPATH=$PYTHONPATH:$(pwd)
             if [ "${{ matrix.service }}" == "backend" ]; then
                pytest backend/tests/
             elif [ "${{ matrix.service }}" == "frontend" ]; then
