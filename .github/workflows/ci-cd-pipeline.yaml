@@ -17,7 +17,29 @@ jobs:
         matrix:
             service: [frontend, backend]
 
+    # Add PostgreSQL service for all jobs
+    services:
+        postgres:
+          image: postgres:13
+          ports:
+            - 5432:5432
+          env:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: users_db
+          options: >-
+            --health-cmd pg_isready
+            --health-interval 10s
+            --health-timeout 5s
+            --health-retries 5
+
     steps:
+        # Conditionally start PostgreSQL service for backend
+        - name: Start PostgreSQL (backend only)
+          if: ${{ matrix.service == 'backend' }}
+          run: echo "PostgreSQL service is enabled for backend"
+          
+
         # Checkout the repository
         - name: Checkout Code
           uses: actions/checkout@v4
