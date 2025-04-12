@@ -1,66 +1,80 @@
 name: CI/CD Pipeline
-on:
-    workflow_dispatch:
-    push:
-        branches:
-            - develop
-env: 
-    DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-    DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-    FRONTEND_IMAGE_NAME: user-registration-frontend
-    BACKEND_IMAGE_NAME: user-registration-backend
-jobs:            
-   build-and-push:
-    name: Build and Push Docker Images
-    runs-on : ubuntu-latest
-    strategy:
-        matrix:
-            service: [frontend, backend]
 
-    # Add PostgreSQL service for all jobs
-    services:
-        postgres:
-          image: postgres:13
-          ports:
-            - 5432:5432
-          env:
-            POSTGRES_USER: myUser
-            POSTGRES_PASSWORD: myPass
-            POSTGRES_DB: postgres
-          options: >-
-            --health-cmd pg_isready
-            --health-interval 10s
-            --health-timeout 5s
-            --health-retries 5
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  FRONTEND_IMAGE_NAME: user-registration-frontend
+  BACKEND_IMAGE_NAME: user-registration-backend
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    name: Frontend - Build and Test
 
     steps:
-        # Conditionally start PostgreSQL service for backend
-        - name: Start PostgreSQL (backend only)
-          if: ${{ matrix.service == 'backend' }}
-          run: echo "PostgreSQL service is enabled for backend"
-          
+        # Checkout Repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+        # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-        # Checkout the repository
-        - name: Checkout Code
-          uses: actions/checkout@v4
+        #install dependencies
+      - name: Install dependencies
+        run: pip install -r frontend/requirements.txt
+
+        #run frontend tests
+      - name: Run frontend tests
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          pytest frontend/tests/
+
+  backend:
+    runs-on: ubuntu-latest
+    name: Backend - Build and Test
+
+    # Define services
+    services:
+      postgres:
+        image: postgres:13
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: myUser
+          POSTGRES_PASSWORD: myPass
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+        # Checkout Repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
         # Set up Python
-        - name: Set up Python
-          uses: actions/setup-python@v4
-          with:
-            python-version: '3.10'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-        # Install dependencies
-        - name: Install dependencies
-          run: |
-            pip install -r ${{ matrix.service }}/requirements.txt
+        #install dependencies
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
 
-        # run tests
-        - name: Run tests
-          run: |
-            export PYTHONPATH=$PYTHONPATH:$(pwd)
-            if [ "${{ matrix.service }}" == "backend" ]; then
-               pytest backend/tests/
-            elif [ "${{ matrix.service }}" == "frontend" ]; then
-               pytest frontend/tests/
-            fi 
+        #run backend tests
+      - name: Run backend tests
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          pytest backend/tests/
