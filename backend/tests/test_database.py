@@ -32,7 +32,7 @@ def test_create_database(mock_connect, mock_env_vars):
     mock_cursor.execute.assert_any_call("CREATE DATABASE test_database")
 
 
-@patch('backend.database.psycopg2.connect')
+@patch('backend.src.database.psycopg2.connect')
 def test_create_users_table(mock_connect):
     # Create mock connection and cursor
     mock_conn = MagicMock()
