@@ -36,7 +36,14 @@ jobs:
       - name: Run frontend tests
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)
-          pytest frontend/tests/
+          mkdir -p frontend/test-results
+          pytest frontend/tests/ --junitxml=frontend/test-results/results.xml
+
+      - name: Archive frontend test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-results
+          path: frontend/test-results/results.xml
 
   backend:
     runs-on: ubuntu-latest
@@ -77,4 +84,11 @@ jobs:
       - name: Run backend tests
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)/backend/src
-          pytest backend/tests/
+          mkdir -p backend/test-results
+          pytest backend/tests/ --junitxml=backend/test-results/results.xml
+
+      - name: Archive backend test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: backend/test-results/results.xml
