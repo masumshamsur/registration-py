@@ -48,22 +48,34 @@ except Exception as e:
     conn = None
 
 # Ensure users table exists
-def create_users_table():
-    if conn:
-        try:
-            with conn.cursor() as cursor:
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS users (
-                        id SERIAL PRIMARY KEY,
-                        firstname VARCHAR(50) NOT NULL,
-                        lastname VARCHAR(50) NOT NULL,
-                        country VARCHAR(50) NOT NULL,
-                        gender VARCHAR(10) NOT NULL
-                    );
-                """)
-                print("✅ 'users' table checked/created successfully!")
-        except Exception as e:
-            print(f"❌ Error creating 'users' table: {e}")
+def create_users_table(connection=None):
+    try:
+        if not connection:
+            connection = psycopg2.connect(
+                dbname=os.getenv('POSTGRES_DATABASE', 'mydatabase'),
+                user=os.getenv('POSTGRES_USER', 'myUser'),
+                password=os.getenv('POSTGRES_PASSWORD', 'myPass'),
+                host=os.getenv('POSTGRES_HOST', 'localhost'),
+                port=os.getenv('POSTGRES_PORT', 5432),
+                cursor_factory=RealDictCursor
+            )
+            connection.autocommit = True
+
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    firstname VARCHAR(50) NOT NULL,
+                    lastname VARCHAR(50) NOT NULL,
+                    country VARCHAR(50) NOT NULL,
+                    gender VARCHAR(10) NOT NULL
+                );
+            """)
+            print("✅ 'users' table checked/created successfully!")
+
+    except Exception as e:
+        print(f"❌ Error creating 'users' table: {e}")
+
 
 create_users_table()  # Ensure table exists
 
