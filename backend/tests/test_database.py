@@ -16,6 +16,8 @@ def test_create_database(mock_connect, mock_env_vars):
     mock_conn = mock_connect.return_value
     mock_cursor = mock_conn.cursor.return_value
 
+    mock_cursor.fetchone.return_value = None  # DB does not exist
+
     create_database()
 
     mock_connect.assert_called_once_with(
@@ -25,8 +27,10 @@ def test_create_database(mock_connect, mock_env_vars):
         host="localhost",
         port="5432",
     )
+
     mock_cursor.execute.assert_any_call("SELECT 1 FROM pg_database WHERE datname = 'test_database'")
     mock_cursor.execute.assert_any_call("CREATE DATABASE test_database")
+
 
 @patch('psycopg2.connect')
 def test_create_users_table(mock_connect, mock_env_vars):
