@@ -9,8 +9,8 @@ on:
 env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-  FRONTEND_IMAGE_NAME: user-registration-frontend
-  BACKEND_IMAGE_NAME: user-registration-backend
+  FRONTEND_IMAGE_NAME: registration-frontend
+  BACKEND_IMAGE_NAME: registration-backend
 
 jobs:
   frontend:
