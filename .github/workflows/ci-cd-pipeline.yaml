@@ -76,5 +76,5 @@ jobs:
         #run backend tests
       - name: Run backend tests
         run: |
-          export PYTHONPATH=$PYTHONPATH:$(pwd)
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/backend/src
           pytest backend/tests/
