@@ -73,8 +73,8 @@ jobs:
         # Update Helm values.yaml for frontend
       - name: Update Helm values.yaml for Frontend
         run: |
-          sed -i "s|repository:.*|repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE_NAME }}|" registration-py-chart-all-togather/values.yaml
-          sed -i "s|tag:.*|tag: ${{ github.run_number }}|" registration-py-chart-all-togather/values.yaml
+          sed -i "/frontend:/,/image:/ s|repository:.*|repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE_NAME }}|" registration-py-chart-all-togather/values.yaml
+          sed -i "/frontend:/,/image:/ s|tag:.*|tag: ${{ github.run_number }}|" registration-py-chart-all-togather/values.yaml
 
       # Print the updated values.yaml file
       - name: Print Updated values.yaml
@@ -157,9 +157,9 @@ jobs:
         # Update Helm values.yaml for backend
       - name: Update Helm values.yaml for Backend
         run: |
-          sed -i "s|repository:.*|repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.BACKEND_IMAGE_NAME }}|" registration-py-chart-all-togather/values.yaml
-          sed -i "s|tag:.*|tag: ${{ github.run_number }}|" registration-py-chart-all-togather/values.yaml
+          sed -i "/backend:/,/image:/ s|repository:.*|repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.BACKEND_IMAGE_NAME }}|" registration-py-chart-all-togather/values.yaml
+          sed -i "/backend:/,/image:/ s|tag:.*|tag: ${{ github.run_number }}|" registration-py-chart-all-togather/values.yaml
           
       # Print the updated values.yaml file
       - name: Print Updated values.yaml
-        run: cat registration-py-chart-all-togather/values.yaml    
+        run: cat registration-py-chart-all-togather/values.yaml
