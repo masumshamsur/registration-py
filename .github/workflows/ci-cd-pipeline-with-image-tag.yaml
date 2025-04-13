@@ -18,17 +18,17 @@ jobs:
     name: Frontend - Build, Test, and Push
 
     steps:
-        # Checkout Repository
+      # Checkout Repository
       - name: Checkout Code
         uses: actions/checkout@v4
       
-        # Set up Python
+      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-        # Cache Python dependencies
+      # Cache Python dependencies
       - name: Cache Python dependencies
         uses: actions/cache@v3
         with:
@@ -37,32 +37,32 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-        # Install dependencies
+      # Install dependencies
       - name: Install dependencies
         run: pip install -r frontend/requirements.txt
 
-        # Run frontend tests
+      # Run frontend tests
       - name: Run frontend tests
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)
           mkdir -p frontend/test-results
           pytest frontend/tests/ --junitxml=frontend/test-results/results.xml
 
-        # Archive frontend test results
+      # Archive frontend test results
       - name: Archive frontend test results
         uses: actions/upload-artifact@v4
         with:
           name: frontend-test-results
           path: frontend/test-results/results.xml
 
-        # Log in to DockerHub
+      # Log in to DockerHub
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-        # Build and push frontend Docker image
+      # Build and push frontend Docker image
       - name: Build and Push Frontend Docker Image
         uses: docker/build-push-action@v4
         with:
@@ -70,24 +70,8 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.run_number }}
 
-      - name: Install yq (mikefarah version)
-        run: |
-          sudo wget https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64 -O /usr/bin/yq
-          sudo chmod +x /usr/bin/yq
-
-        # Update Helm values.yaml for frontend
-      - name: Update Helm values.yaml for Frontend
-        run: |
-          yq eval ".microservice.frontend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE_NAME }}\"" -i registration-py-chart-all-togather/values.yaml
-          yq eval ".microservice.frontend.image.tag = \"${{ github.run_number }}\"" -i registration-py-chart-all-togather/values.yaml
-
-       # Print the updated values.yaml file
-      - name: Print Updated values.yaml
-        run: cat registration-py-chart-all-togather/values.yaml    
-
 
   backend:
-    needs: frontend      # 👈 Ensures this runs AFTER frontend
     runs-on: ubuntu-latest
     name: Backend - Build, Test, and Push
 
@@ -108,17 +92,17 @@ jobs:
           --health-retries 5
 
     steps:
-        # Checkout Repository
+      # Checkout Repository
       - name: Checkout Code
         uses: actions/checkout@v4
 
-        # Set up Python
+      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-        # Cache Python dependencies
+      # Cache Python dependencies
       - name: Cache Python dependencies
         uses: actions/cache@v3
         with:
@@ -127,32 +111,32 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-        # Install dependencies
+      # Install dependencies
       - name: Install dependencies
         run: pip install -r backend/requirements.txt
 
-        # Run backend tests
+      # Run backend tests
       - name: Run backend tests
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)/backend/src
           mkdir -p backend/test-results
           pytest backend/tests/ --junitxml=backend/test-results/results.xml
 
-        # Archive backend test results
+      # Archive backend test results
       - name: Archive backend test results
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-results
           path: backend/test-results/results.xml
 
-        # Log in to DockerHub
+      # Log in to DockerHub
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-        # Build and push backend Docker image
+      # Build and push backend Docker image
       - name: Build and Push Backend Docker Image
         uses: docker/build-push-action@v4
         with:
@@ -160,17 +144,26 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.run_number }}
 
-      - name: Install yq (mikefarah version)
+
+  update-helm:
+    name: "Update Helm Chart"
+    needs: [frontend, backend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install yq
         run: |
-            sudo wget https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64 -O /usr/bin/yq
-            sudo chmod +x /usr/bin/yq
-      
-     # Update Helm values.yaml for backend
-      - name: Update Helm values.yaml for Backend
-        run: |       
-            yq eval ".microservice.backend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/${{ env.BACKEND_IMAGE_NAME }}\"" -i registration-py-chart-all-togather/values.yaml
-            yq eval ".microservice.backend.image.tag = \"${{ github.run_number }}\"" -i registration-py-chart-all-togather/values.yaml
-                
-      # Print the updated values.yaml file
-      - name: Print Updated values.yaml
+          sudo wget https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
+
+      - name: Update Helm values.yaml
+        run: |
+          yq eval ".microservice.frontend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/registration-frontend\"" -i registration-py-chart-all-togather/values.yaml
+          yq eval ".microservice.frontend.image.tag = \"${{ github.run_number }}\"" -i registration-py-chart-all-togather/values.yaml
+          yq eval ".microservice.backend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/registration-backend\"" -i registration-py-chart-all-togather/values.yaml
+          yq eval ".microservice.backend.image.tag = \"${{ github.run_number }}\"" -i registration-py-chart-all-togather/values.yaml
+
+      - name: Print updated values.yaml for debug
         run: cat registration-py-chart-all-togather/values.yaml
