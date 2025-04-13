@@ -78,8 +78,8 @@ jobs:
         # Update Helm values.yaml for backend
       - name: Update Helm values.yaml for Frontend
         run: |
-            yq eval ".microservice.frontend.image.repository = "${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE_NAME }}\"" -i registration-py-chart-all-togather/values.yaml
-            yq eval ".microservice.frontend.image.tag = "${{ github.run_number }}\"" -i registration-py-chart-all-togather/values.yaml
+          yq eval ".microservice.frontend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE_NAME }}\"" -i registration-py-chart-all-togather/values.yaml
+          yq eval ".microservice.frontend.image.tag = \"${{ github.run_number }}\"" -i registration-py-chart-all-togather/values.yaml
 
        # Print the updated values.yaml file
       - name: Print Updated values.yaml
