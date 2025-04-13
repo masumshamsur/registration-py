@@ -87,6 +87,7 @@ jobs:
 
 
   backend:
+    needs: frontend      # 👈 Ensures this runs AFTER frontend
     runs-on: ubuntu-latest
     name: Backend - Build, Test, and Push
 
