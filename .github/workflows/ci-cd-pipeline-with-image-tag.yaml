@@ -70,13 +70,17 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.run_number }}
 
-        # Update Helm values.yaml for frontend
+      - name: Install yq
+        run: sudo apt-get install -y yq
+
+        # Update Helm values.yaml for backend
+        # Frontend job
       - name: Update Helm values.yaml for Frontend
         run: |
-          sed -i '' "/frontend:/,/image:/ s|repository:.*|repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE_NAME }}|" registration-py-chart-all-togather/values.yaml
-          sed -i '' "/frontend:/,/image:/ s|tag:.*|tag: ${{ github.run_number }}|" registration-py-chart-all-togather/values.yaml
+                yq eval ".microservice.frontend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE_NAME }}\"" -i registration-py-chart-all-togather/values.yaml
+                yq eval ".microservice.frontend.image.tag = \"${{ github.run_number }}\"" -i registration-py-chart-all-togather/values.yaml
 
-      # Print the updated values.yaml file
+       # Print the updated values.yaml file
       - name: Print Updated values.yaml
         run: cat registration-py-chart-all-togather/values.yaml    
 
