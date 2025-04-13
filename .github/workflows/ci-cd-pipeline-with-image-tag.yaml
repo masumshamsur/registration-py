@@ -6,6 +6,9 @@ on:
     branches:
       - develop
 
+permissions:
+  contents: write   # <--- ✅ Add this line to allow push access
+  
 env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
