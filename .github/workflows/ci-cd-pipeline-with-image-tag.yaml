@@ -75,7 +75,7 @@ jobs:
           sudo wget https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64 -O /usr/bin/yq
           sudo chmod +x /usr/bin/yq
 
-        # Update Helm values.yaml for backend
+        # Update Helm values.yaml for frontend
       - name: Update Helm values.yaml for Frontend
         run: |
           yq eval ".microservice.frontend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE_NAME }}\"" -i registration-py-chart-all-togather/values.yaml
@@ -159,12 +159,17 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.BACKEND_IMAGE_NAME }}:${{ github.run_number }}
 
-        # Update Helm values.yaml for backend
-      - name: Update Helm values.yaml for Backend
+      - name: Install yq (mikefarah version)
         run: |
-          sed -i '' "/backend:/,/image:/ s|repository:.*|repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.BACKEND_IMAGE_NAME }}|" registration-py-chart-all-togather/values.yaml
-          sed -i '' "/backend:/,/image:/ s|tag:.*|tag: ${{ github.run_number }}|" registration-py-chart-all-togather/values.yaml
-          
+            sudo wget https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64 -O /usr/bin/yq
+            sudo chmod +x /usr/bin/yq
+      
+     # Update Helm values.yaml for backend
+      - name: Update Helm values.yaml for Backend
+        run: |       
+            yq eval ".microservice.backend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/${{ env.BACKEND_IMAGE_NAME }}\"" -i registration-py-chart-all-togather/values.yaml
+            yq eval ".microservice.backend.image.tag = \"${{ github.run_number }}\"" -i registration-py-chart-all-togather/values.yaml
+                
       # Print the updated values.yaml file
       - name: Print Updated values.yaml
         run: cat registration-py-chart-all-togather/values.yaml
