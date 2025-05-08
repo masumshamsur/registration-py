@@ -5,14 +5,14 @@ microservice:
   backend:
     image:
       repository: masum012924/registration-backend
-      tag: "11"
+      tag: "12"
     service:
       type: ClusterIP
       port: 8000
   frontend:
     image:
       repository: masum012924/registration-frontend
-      tag: "11"
+      tag: "12"
     service:
       type: NodePort
       port: 5000
