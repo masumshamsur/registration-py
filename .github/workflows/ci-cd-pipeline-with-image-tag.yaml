@@ -163,18 +163,18 @@ jobs:
 
       - name: Update Helm values.yaml
         run: |
-          yq eval ".microservice.frontend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/registration-frontend\"" -i registration-py-chart-all-togather/values.yaml
-          yq eval ".microservice.frontend.image.tag = \"${{ github.run_number }}\"" -i registration-py-chart-all-togather/values.yaml
-          yq eval ".microservice.backend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/registration-backend\"" -i registration-py-chart-all-togather/values.yaml
-          yq eval ".microservice.backend.image.tag = \"${{ github.run_number }}\"" -i registration-py-chart-all-togather/values.yaml
+          yq eval ".microservice.frontend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/registration-frontend\"" -i registration-py-chart-with_service_account/values.yaml
+          yq eval ".microservice.frontend.image.tag = \"${{ github.run_number }}\"" -i registration-py-chart-with_service_account/values.yaml
+          yq eval ".microservice.backend.image.repository = \"${{ secrets.DOCKERHUB_USERNAME }}/registration-backend\"" -i registration-py-chart-with_service_account/values.yaml
+          yq eval ".microservice.backend.image.tag = \"${{ github.run_number }}\"" -i registration-py-chart-with_service_account/values.yaml
 
       - name: Print updated values.yaml for debug
-        run: cat registration-py-chart-all-togather/values.yaml
+        run: cat registration-py-chart-with_service_account/values.yaml
       
       - name: Commit and Push Changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add registration-py-chart-all-togather/values.yaml
+          git add registration-py-chart-with_service_account/values.yaml
           git commit -m "chore: update image tags in values.yaml (run ${{ github.run_number }})" || echo "No changes to commit"
           git push origin ${{ github.ref }}  
