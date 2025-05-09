@@ -1,0 +1,5 @@
+# Chart.yaml
+apiVersion: v2
+name: registration-py-chart-with-service-account
+description: "{{ .Values.microservice.description }}"
+version: 0.1.0
