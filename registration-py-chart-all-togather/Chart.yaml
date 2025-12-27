@@ -1,5 +1,6 @@
 # Chart.yaml
 apiVersion: v2
-name: registration-py-chart
-description: "{{ .Values.microservice.description }}"
+name: registration-py-chart-all-togather
+description: A Helm chart for Kubernetes to deploy the Registration-py application with Postgres StatefulSet
+type: application
 version: 0.1.0

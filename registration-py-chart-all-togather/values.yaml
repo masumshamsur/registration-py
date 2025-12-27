@@ -1,6 +1,5 @@
 microservice:
-  name: registration
-  description: A microservice for user registration and authentication
+  name: registration-py
   namespace: registration-py-postgres
   backend:
     image:
