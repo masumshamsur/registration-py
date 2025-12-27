@@ -3,13 +3,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: backend-sa
-  namespace: registration-fb
+  namespace: registration-py-postgres
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: backend-role
-  namespace: registration-fb
+  namespace: registration-py-postgres
 rules:
   - apiGroups: [""]
     resources: ["pods", "secrets"]
@@ -19,11 +19,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: backend-rolebinding
-  namespace: registration-fb
+  namespace: registration-py-postgres
 subjects:
   - kind: ServiceAccount
     name: backend-sa
-    namespace: registration-fb
+    namespace: registration-py-postgres
 roleRef:
   kind: Role
   name: backend-role
@@ -34,7 +34,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: registration-fb
+  namespace: registration-py-postgres
 spec:
   replicas: 1
   selector:
@@ -86,7 +86,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend-service
-  namespace: registration-fb
+  namespace: registration-py-postgres
 spec:
   selector:
     app: backend
@@ -101,7 +101,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: registration-fb
+  namespace: registration-py-postgres
 spec:
   replicas: 1
   selector:
@@ -141,7 +141,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: frontend-service
-  namespace: registration-fb
+  namespace: registration-py-postgres
 spec:
   selector:
     app: frontend
@@ -157,7 +157,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-secret
-  namespace: registration-fb
+  namespace: registration-py-postgres
 type: Opaque
 data:
   username: bXlVc2Vy  # base64 for 'myUser'
@@ -168,7 +168,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
-  namespace: registration-fb
+  namespace: registration-py-postgres
 spec:
   serviceName: postgres-service
   replicas: 1
@@ -211,7 +211,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-service
-  namespace: registration-fb
+  namespace: registration-py-postgres
 spec:
   clusterIP: None
   selector:
@@ -226,7 +226,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: postgres-pv
-  namespace: registration-fb
+  namespace: registration-py-postgres
 spec:
   capacity:
     storage: 10Gi
@@ -240,7 +240,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
-  namespace: registration-fb
+  namespace: registration-py-postgres
 spec:
   accessModes:
     - ReadWriteOnce

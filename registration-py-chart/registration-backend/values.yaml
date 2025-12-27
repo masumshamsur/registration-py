@@ -1,7 +1,7 @@
 microservice:
   name: registration-backend
   description: A microservice for user registration and authentication
-  namespace: registration-fb
+  namespace: registration-py-postgres
   replicaCount: 1
   image:
     repository: masum012924/registration-backend
