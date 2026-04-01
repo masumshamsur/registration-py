@@ -7,7 +7,7 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/masumshamsur/registration-py.git
+    repoURL: https://github.com/masumshamsur/registration-py_PostgreSQL-Docker-K8S-Helm-GitHubAction-ArgoCD.git
     targetRevision: main
     path: registration-py-chart-all-togather
     helm:
